@@ -1,3 +1,22 @@
+*** Directions **
+
+The first inlet receives an audio signal.  To run the
+external in its standard, probabilistic mode, connect
+it to a noise~ object.
+
+The second inlet receies a float that determines
+the number of elements (which directly corresponds 
+to the periodicity of the output signal).  Minimum 
+is 2; maximum is 1000.
+
+The third inlet receives a float which determines the
+exponent of the growth function.  This directly
+corresponds to how predictable the periodicity of the
+output signal will be.  Minimum is 0 (white noise);
+maximum is 1000.
+
+*** Info ***
+
 # Statfeed
 Statistical Feedback external for Pure Data
 
