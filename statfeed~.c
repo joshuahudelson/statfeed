@@ -148,49 +148,53 @@ if(x->choice == 0.0){
 	x->choice = 0.001;
 }
 
-if (x->cumuexponbins[0] >= x->choice){
-	x->choiceindex = 0;
-}
-else {
-	for(i=1;i<x->numbinsinuse;i++){
-     		if ((x->cumuexponbins[i] >= x->choice) && (x->cumuexponbins[i-1] < x->choice)) {
-			x->choiceindex = i;
-			break;	
+
+
+if (x->numbinsinuse > 5){
+
+	if (x->cumuexponbins[0] >= x->choice){
+		x->choiceindex = 0;
+	}
+	else {
+		for(i=1;i<x->numbinsinuse;i++){
+	     		if ((x->cumuexponbins[i] >= x->choice) && (x->cumuexponbins[i-1] < x->choice)) {
+				x->choiceindex = i;
+				break;	
+			}
 		}
 	}
 }
-
-
-/*
+else {
 
 //  Do a binary search for the choice's value within cumuexponbins and set choiceindex equal to that index.
-x->bottom = 0;
-x->top = x->numbinsinuse-1;
 
-while (x->top >= x->bottom){
+	x->bottom = 0;
+	x->top = x->numbinsinuse-1;
 
-    x->mid = (int) (x->bottom + ((x->top - x->bottom) * 0.5));
+	while (x->top >= x->bottom){
 
-    if (x->choice > x->cumuexponbins[x->mid]){
-        if (x->choice <= x->cumuexponbins[x->mid + 1]){
-            x->choiceindex = x->mid + 1;
-            break;
-        }
-        else{
-            x->bottom = x->mid + 1;
-        }
-    }
-    else{
-        if(x->choice > x->cumuexponbins[x->mid-1]){
-            x->choiceindex = x->mid;
-            break;
-        }
-        else{
-            x->top = x->mid - 1;
-        }
-    }
+	    x->mid = (int) (x->bottom + ((x->top - x->bottom) * 0.5));
+
+	    if (x->choice > x->cumuexponbins[x->mid]){
+		if (x->choice <= x->cumuexponbins[x->mid + 1]){
+		    x->choiceindex = x->mid + 1;
+		    break;
+		}
+		else{
+		    x->bottom = x->mid + 1;
+		}
+	    }
+	    else{
+		if(x->choice > x->cumuexponbins[x->mid-1]){
+		    x->choiceindex = x->mid;
+		    break;
+		}
+		else{
+		    x->top = x->mid - 1;
+		}
+	    }
+	}
 }
-*/
 
 
 //  Increment all bins in use.
