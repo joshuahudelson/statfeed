@@ -148,6 +148,21 @@ if(x->choice == 0.0){
 	x->choice = 0.001;
 }
 
+if (x->cumuexponbins[0] >= x->choice){
+	x->choiceindex = 0;
+}
+else {
+	for(i=1;i<x->numbinsinuse;i++){
+     		if ((x->cumuexponbins[i] >= x->choice) && (x->cumuexponbins[i-1] < x->choice)) {
+			x->choiceindex = i;
+			break;	
+		}
+	}
+}
+
+
+/*
+
 //  Do a binary search for the choice's value within cumuexponbins and set choiceindex equal to that index.
 x->bottom = 0;
 x->top = x->numbinsinuse-1;
@@ -175,6 +190,8 @@ while (x->top >= x->bottom){
         }
     }
 }
+*/
+
 
 //  Increment all bins in use.
 for(i=0;i<x->numbinsinuse;i++){
