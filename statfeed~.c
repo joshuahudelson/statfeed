@@ -59,6 +59,17 @@ typedef struct _statfeed_tilde {
 
 } t_statfeed_tilde;
 
+
+float lin_interp(float val1, float val2, float exponent){
+	int temp1 = (int) exponent;
+	float mult1 = exponent - temp1;
+ 	float mult2 = 1.0 - mult1;
+
+	float result = (val1*mult2) + (val2*mult1);
+
+	return result;
+}
+
 //-------------------------------------------------------PERFORM FUNCTION
 t_int *statfeed_tilde_perform(t_int *w)
 {
@@ -107,13 +118,24 @@ for(i=0;i<x->numbinsinuse;i++){
 	}
 }
 
+// Calculate the first value in each array
+
 if (x->expon<1.0){
 	x->exponbins[0] = x->lookupless[(int) (((x->numpossibleincrements-1)*((float) x->bins[0])/ ((float) localmax)))][(int) ((x->numpossibleincrements - 1)*x->expon)];
 	x->cumuexponbins[0] = x->exponbins[0];
 }
 
 else{
-	x->exponbins[0] = x->lookupmore[(int) (((x->numpossibleincrements-1)*((float) x->bins[0])/ ((float) localmax)))][(int) x->expon];
+	if (x->expon >= x->maxexpon){
+		x->expon = x->maxexpon-1;
+	}
+
+	float value1 = x->lookupmore[(int) (((x->numpossibleincrements-1)*((float) x->bins[0])/ ((float) localmax)))][(int) x->expon];
+
+	float value2 = x->lookupmore[(int) (((x->numpossibleincrements-1)*((float) x->bins[0])/ ((float) localmax)))][(int) x->expon + 1];
+
+	x->exponbins[0] = lin_interp(value1, value2, x->expon);
+
 	x->cumuexponbins[0] = x->exponbins[0];
 }
 
@@ -125,7 +147,12 @@ for(i=1;i<x->numbinsinuse;i++){
 		x->cumuexponbins[i] = x->cumuexponbins[i-1] + x->exponbins[i];
 	}
 	else{
-		x->exponbins[i] = x->lookupmore[((int) ((x->numpossibleincrements - 1)*(x->bins[i]/(float) localmax)))][(int) x->expon];
+		float value3 = x->lookupmore[((int) ((x->numpossibleincrements - 1)*(x->bins[i]/(float) localmax)))][(int) x->expon];
+
+		float value4 = x->lookupmore[((int) ((x->numpossibleincrements - 1)*(x->bins[i]/(float) localmax)))][(int) x->expon + 1];
+
+		x->exponbins[i] = lin_interp(value3, value4, x->expon);
+
 		x->cumuexponbins[i] = x->cumuexponbins[i-1] + x->exponbins[i];
 	}
 }
