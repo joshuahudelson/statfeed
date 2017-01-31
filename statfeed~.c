@@ -236,7 +236,7 @@ for(i=0;i<x->numbinsinuse;i++){
 x->outputter = (((float) x->choiceindex / (float) (x->numbinsinuse - 1)) - .5);
 
 //  Scale outputter to between -1.0 and 1.0 (keeping this separate from above because it might be necessary to narrow the range, slightly, in the future).
-*out++ =  x->outputter; // * 2.0;
+*out++ =  x->outputter * 2.0;
 
 //  Set the chosen bin to zero.
 x->bins[x->choiceindex] = 0;
