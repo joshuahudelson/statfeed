@@ -81,7 +81,6 @@ void statfeed_update(t_statfeed * x, t_floatarg f){
   statfeed_scale(x);
   statfeed_exponentiate(x);
   statfeed_sum(x);
-
 }
 
 void reset_statfeed(t_statfeed * x){
@@ -99,9 +98,13 @@ void statfeed_setExp(t_statfeed * x, t_floatarg f){
 }
 
 void statfeed_onbang(t_statfeed * x, t_floatarg f){  // This isn't a bang, it's a float to trigger it.
+  post("Bangs do nothing for me.");
+}
 
+void statfeed_onfloat(t_statfeed * x, t_floatarg f){
   statfeed_getIndex(x, f);
   statfeed_update(x, f);
+  outlet_float(x->out, x->most_recent_output);
 }
 
 void * statfeed_new(t_floatarg f1, t_floatarg f2){
@@ -134,6 +137,8 @@ void statfeed_setup(void){
                              0);
 
   class_addbang(statfeed_class, (t_method) statfeed_onbang);
+
+  class_addfloat(statfeed_class, (t_method) statfeed_onfloat);
 
   class_addmethod(statfeed_class,
                   (t_method) statfeed_setElems,
