@@ -20,6 +20,7 @@ void statfeed_getIndex(t_statfeed * x, t_floatarg f){
 
   int found_flag = 0;
   float search_term = f * x->cumulative_array[x->num_elems-1];
+  post("search term: %f", f);
 
   if (search_term < x->cumulative_array[0]){
     found_flag = 1;
@@ -55,22 +56,23 @@ void statfeed_scale(t_statfeed * x){
       largest = x->count_array[i];
     }
   }
+
   for (int i=0;i<x->num_elems;i++){
-  x->weight_array[i] = (float) x->count_array[i]/largest;
+    x->weight_array[i] = (float) x->count_array[i]/largest;
   }
 }
 
 void statfeed_exponentiate(t_statfeed * x){
   for (int i=0;i<x->num_elems;i++){
-    x->weight_array[i] = pow(x->weight_array[i], x->current_exponent);
+    x->weight_array[i] = pow(x->count_array[i], x->current_exponent);
+    post("elem, weight: %f, %f", x->count_array[i], x->weight_array[i]);
   }
 }
 
 void statfeed_sum(t_statfeed * x){
-  //prime:
   x->cumulative_array[0] = x->weight_array[0];
   for (int i=1; i<x->num_elems-1; i++){
-    x->weight_array[i] = x->weight_array[i-1] + x->count_array[i];
+    x->cumulative_array[i] = x->cumulative_array[i-1] + x->weight_array[i];
   }
 }
 
@@ -85,7 +87,7 @@ void statfeed_update(t_statfeed * x, t_floatarg f){
 
 void reset_statfeed(t_statfeed * x){
   for (int i=0; i<x->num_elems; i++){
-    x->count_array[i] = 0.0;
+    x->count_array[i] = 1.0;
   }
 }
 
@@ -102,6 +104,7 @@ void statfeed_onbang(t_statfeed * x, t_floatarg f){  // This isn't a bang, it's 
 }
 
 void statfeed_onfloat(t_statfeed * x, t_floatarg f){
+  post("Input float: %f", f);
   statfeed_getIndex(x, f);
   statfeed_update(x, f);
   outlet_float(x->out, x->most_recent_output);
@@ -116,6 +119,13 @@ void * statfeed_new(t_floatarg f1, t_floatarg f2){
   x->in_elems = inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("in_elems"));
   x->in_exp   = inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("in_exp"));
   x->out      = outlet_new(&x->x_obj, &s_float);
+
+  for (int i=0; i<100; i++){
+    x->count_array[i] = 1;
+  }
+
+  statfeed_exponentiate(x);
+  statfeed_sum(x);
 
   return (void *) x;
 }
@@ -147,7 +157,7 @@ void statfeed_setup(void){
                   0);
 
   class_addmethod(statfeed_class,
-                  (t_method) statfeed_setElems,
+                  (t_method) statfeed_setExp,
                   gensym("in_exp"),
                   A_DEFFLOAT,
                   0);
