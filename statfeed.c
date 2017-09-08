@@ -5,7 +5,8 @@ static t_class * statfeed_class;
 
 typedef struct statfeed{
   t_object    x_obj;
-  t_int       num_elems, current_exponent;
+  t_int       num_elems;
+  t_float     current_exponent;
   t_int       most_recent_output;
   t_float     count_array[100];
   t_float     weight_array[100];
@@ -37,6 +38,7 @@ void statfeed_getIndex(t_statfeed * x, t_floatarg f){
   if (found_flag == 0){
     x->most_recent_output = 1;
   }
+  post("most recent output = %f", x->most_recent_output);
 }
 
 void statfeed_increment(t_statfeed * x){
@@ -71,8 +73,11 @@ void statfeed_exponentiate(t_statfeed * x){
 
 void statfeed_sum(t_statfeed * x){
   x->cumulative_array[0] = x->weight_array[0];
-  for (int i=1; i<x->num_elems-1; i++){
+  for (int i=1; i<x->num_elems; i++){
     x->cumulative_array[i] = x->cumulative_array[i-1] + x->weight_array[i];
+  }
+  for (int i = 0; i<x->num_elems; i++){
+    post("cumu %i: %f", i, x->cumulative_array[i]);
   }
 }
 
@@ -110,6 +115,7 @@ void statfeed_onfloat(t_statfeed * x, t_floatarg f){
   outlet_float(x->out, x->most_recent_output);
 }
 
+
 void * statfeed_new(t_floatarg f1, t_floatarg f2){
 
   t_statfeed * x = (t_statfeed *) pd_new(statfeed_class);
@@ -129,6 +135,7 @@ void * statfeed_new(t_floatarg f1, t_floatarg f2){
 
   return (void *) x;
 }
+
 
 void statfeed_free(t_statfeed * x){
   inlet_free(x->in_elems);
