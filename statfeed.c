@@ -19,6 +19,10 @@ typedef struct statfeed{
 void statfeed_getIndex(t_statfeed * x, t_floatarg f){
   // make this use "low" and "high"
 
+  if ( (f < 0.0) | (f > 1.0)){
+    post("Input number outside of range (0.0 to 1.0)");
+  }
+
   int found_flag = 0;
   float search_term = f * x->cumulative_array[x->num_elems-1];
   post("search term: %f", f);
@@ -36,7 +40,7 @@ void statfeed_getIndex(t_statfeed * x, t_floatarg f){
     }
   }
   if (found_flag == 0){
-    x->most_recent_output = 1;
+    x->most_recent_output = x->num_elems-1;
   }
   post("most recent output = %f", x->most_recent_output);
 }
