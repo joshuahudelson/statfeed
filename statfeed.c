@@ -1,5 +1,8 @@
 #include "m_pd.h"
 #include "math.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 static t_class * statfeed_class;
 
@@ -15,6 +18,7 @@ typedef struct statfeed{
   t_outlet    * out;
 
 }t_statfeed;
+
 
 void statfeed_getIndex(t_statfeed * x, t_floatarg f){
   // make this use "low" and "high"
@@ -45,15 +49,18 @@ void statfeed_getIndex(t_statfeed * x, t_floatarg f){
   post("most recent output = %f", x->most_recent_output);
 }
 
+
 void statfeed_increment(t_statfeed * x){
   for (int i=0; i<x->num_elems; i++){
     x->count_array[i] += 1;
   }
 }
 
+
 void statfeed_zero(t_statfeed * x){
   x->count_array[x->most_recent_output] = 0;
 }
+
 
 void statfeed_scale(t_statfeed * x){
   int largest = 0;
@@ -62,11 +69,11 @@ void statfeed_scale(t_statfeed * x){
       largest = x->count_array[i];
     }
   }
-
   for (int i=0;i<x->num_elems;i++){
     x->weight_array[i] = (float) x->count_array[i]/largest;
   }
 }
+
 
 void statfeed_exponentiate(t_statfeed * x){
   for (int i=0;i<x->num_elems;i++){
@@ -74,6 +81,7 @@ void statfeed_exponentiate(t_statfeed * x){
     post("elem, weight: %f, %f", x->count_array[i], x->weight_array[i]);
   }
 }
+
 
 void statfeed_sum(t_statfeed * x){
   x->cumulative_array[0] = x->weight_array[0];
@@ -85,6 +93,7 @@ void statfeed_sum(t_statfeed * x){
   }
 }
 
+
 void statfeed_update(t_statfeed * x, t_floatarg f){
 
   statfeed_increment(x);
@@ -94,29 +103,42 @@ void statfeed_update(t_statfeed * x, t_floatarg f){
   statfeed_sum(x);
 }
 
+
 void reset_statfeed(t_statfeed * x){
   for (int i=0; i<x->num_elems; i++){
     x->count_array[i] = 1.0;
   }
 }
 
+
 void statfeed_setElems(t_statfeed * x, t_floatarg f){
   x->num_elems = f;
 }
+
 
 void statfeed_setExp(t_statfeed * x, t_floatarg f){
   x->current_exponent = f;
 }
 
+
 void statfeed_onbang(t_statfeed * x, t_floatarg f){  // This isn't a bang, it's a float to trigger it.
   post("Bangs do nothing for me.");
 }
+
 
 void statfeed_onfloat(t_statfeed * x, t_floatarg f){
   post("Input float: %f", f);
   statfeed_getIndex(x, f);
   statfeed_update(x, f);
   outlet_float(x->out, x->most_recent_output);
+}
+
+void statfeed_randomize(t_statfeed * x){
+  srand(time(NULL));
+  for(int i=0; i<x->num_elems; i++){
+    x->count_array[i] = rand() % 10;
+  }
+  post("Count [1]: %f", x->count_array[1]);
 }
 
 
@@ -147,6 +169,7 @@ void statfeed_free(t_statfeed * x){
   outlet_free(x->out);
 }
 
+
 void statfeed_setup(void){
   statfeed_class = class_new(gensym("statfeed"),
                              (t_newmethod) statfeed_new,
@@ -160,6 +183,11 @@ void statfeed_setup(void){
   class_addbang(statfeed_class, (t_method) statfeed_onbang);
 
   class_addfloat(statfeed_class, (t_method) statfeed_onfloat);
+
+  class_addmethod(statfeed_class,
+                  (t_method) statfeed_randomize,
+                  gensym("randomize"),
+                  0);
 
   class_addmethod(statfeed_class,
                   (t_method) statfeed_setElems,
