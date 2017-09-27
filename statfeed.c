@@ -15,7 +15,7 @@ typedef struct statfeed{
   t_float     weight_array[100];
   t_float     cumulative_array[100];
   t_inlet     * in_elems, * in_exp;
-  t_outlet    * out;
+  t_outlet    * out, * outlist;
 
 }t_statfeed;
 
@@ -123,6 +123,12 @@ void statfeed_setExp(t_statfeed * x, t_floatarg f){
 
 void statfeed_onbang(t_statfeed * x, t_floatarg f){  // This isn't a bang, it's a float to trigger it.
   post("Bangs do nothing for me.");
+  //Ok, erase the above and make it spit out the COUNTS.
+  t_atom at[3];
+  SETFLOAT(at, 55);
+  SETFLOAT(at+1, 56);
+  SETFLOAT(at+2, 57);
+  outlet_list(x->outlist, &s_list, 3, at);
 }
 
 
@@ -151,6 +157,7 @@ void * statfeed_new(t_floatarg f1, t_floatarg f2){
   x->in_elems = inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("in_elems"));
   x->in_exp   = inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("in_exp"));
   x->out      = outlet_new(&x->x_obj, &s_float);
+  x->outlist  = outlet_new(&x->x_obj, &s_list);
 
   for (int i=0; i<100; i++){
     x->count_array[i] = 1;
