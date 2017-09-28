@@ -123,12 +123,12 @@ void statfeed_setExp(t_statfeed * x, t_floatarg f){
 
 void statfeed_onbang(t_statfeed * x, t_floatarg f){  // This isn't a bang, it's a float to trigger it.
   post("Bangs do nothing for me.");
-  //Ok, erase the above and make it spit out the COUNTS.
-  t_atom at[3];
-  SETFLOAT(at, 55);
-  SETFLOAT(at+1, 56);
-  SETFLOAT(at+2, 57);
-  outlet_list(x->outlist, &s_list, 3, at);
+
+  t_atom at[x->num_elems];
+  for (int i=0; i<x->num_elems; i++){
+    SETFLOAT(at+i, x->count_array[i]);
+  }
+  outlet_list(x->outlist, &s_list, x->num_elems, at);
 }
 
 
