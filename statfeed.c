@@ -93,7 +93,6 @@ void statfeed_sum(t_statfeed * x){
   }
 }
 
-
 void statfeed_update(t_statfeed * x, t_floatarg f){
 
   statfeed_increment(x);
@@ -147,6 +146,15 @@ void statfeed_randomize(t_statfeed * x){
   post("Count [1]: %f", x->count_array[1]);
 }
 
+void statfeed_counts_out(t_statfeed * x){
+  //same as on_bang
+  t_atom at[x->num_elems];
+  for (int i=0; i<x->num_elems; i++){
+    SETFLOAT(at+i, x->count_array[i]);
+  }
+  outlet_list(x->outlist, &s_list, x->num_elems, at);
+}
+
 
 void * statfeed_new(t_floatarg f1, t_floatarg f2){
 
@@ -174,6 +182,7 @@ void statfeed_free(t_statfeed * x){
   inlet_free(x->in_elems);
   inlet_free(x->in_exp);
   outlet_free(x->out);
+  outlet_free(x->outlist);
 }
 
 
@@ -190,6 +199,11 @@ void statfeed_setup(void){
   class_addbang(statfeed_class, (t_method) statfeed_onbang);
 
   class_addfloat(statfeed_class, (t_method) statfeed_onfloat);
+
+  class_addmethod(statfeed_class,
+                   (t_method) statfeed_counts_out,
+                   gensym("counts_out"),
+                   0);
 
   class_addmethod(statfeed_class,
                   (t_method) statfeed_randomize,
