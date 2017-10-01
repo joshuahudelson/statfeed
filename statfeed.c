@@ -29,7 +29,6 @@ void statfeed_getIndex(t_statfeed * x, t_floatarg f){
 
   int found_flag = 0;
   float search_term = f * x->cumulative_array[x->num_elems-1];
-  post("search term: %f", f);
 
   if (search_term < x->cumulative_array[0]){
     found_flag = 1;
@@ -46,7 +45,6 @@ void statfeed_getIndex(t_statfeed * x, t_floatarg f){
   if (found_flag == 0){
     x->most_recent_output = x->num_elems-1;
   }
-  post("most recent output = %f", x->most_recent_output);
 }
 
 
@@ -78,7 +76,6 @@ void statfeed_scale(t_statfeed * x){
 void statfeed_exponentiate(t_statfeed * x){
   for (int i=0;i<x->num_elems;i++){
     x->weight_array[i] = pow(x->count_array[i], x->current_exponent);
-    post("elem, weight: %f, %f", x->count_array[i], x->weight_array[i]);
   }
 }
 
@@ -89,12 +86,10 @@ void statfeed_sum(t_statfeed * x){
     x->cumulative_array[i] = x->cumulative_array[i-1] + x->weight_array[i];
   }
   for (int i = 0; i<x->num_elems; i++){
-    post("cumu %i: %f", i, x->cumulative_array[i]);
   }
 }
 
 void statfeed_update(t_statfeed * x, t_floatarg f){
-
   statfeed_increment(x);
   statfeed_zero(x);
   statfeed_scale(x);
@@ -121,18 +116,13 @@ void statfeed_setExp(t_statfeed * x, t_floatarg f){
 
 
 void statfeed_onbang(t_statfeed * x, t_floatarg f){  // This isn't a bang, it's a float to trigger it.
-  post("Bangs do nothing for me.");
-
-  t_atom at[x->num_elems];
   for (int i=0; i<x->num_elems; i++){
-    SETFLOAT(at+i, x->count_array[i]);
+    post("Count %i: %f", i, x->count_array[i]);
   }
-  outlet_list(x->outlist, &s_list, x->num_elems, at);
 }
 
 
 void statfeed_onfloat(t_statfeed * x, t_floatarg f){
-  post("Input float: %f", f);
   statfeed_getIndex(x, f);
   statfeed_update(x, f);
   outlet_float(x->out, x->most_recent_output);
@@ -143,7 +133,6 @@ void statfeed_randomize(t_statfeed * x){
   for(int i=0; i<x->num_elems; i++){
     x->count_array[i] = rand() % 10;
   }
-  post("Count [1]: %f", x->count_array[1]);
 }
 
 void statfeed_counts_out(t_statfeed * x){
