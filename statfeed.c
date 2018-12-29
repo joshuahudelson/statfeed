@@ -24,7 +24,7 @@ void statfeed_getIndex(t_statfeed * x, t_floatarg f){
   // make this use "low" and "high"
 
   if ( (f < 0.0) | (f > 1.0)){
-    post("Input number outside of range (0.0 to 1.0)");
+    post("Input number is outside of range (0.0 to 1.0)");
   }
 
   int found_flag = 0;
@@ -75,7 +75,7 @@ void statfeed_scale(t_statfeed * x){
 
 void statfeed_exponentiate(t_statfeed * x){
   for (int i=0;i<x->num_elems;i++){
-    x->weight_array[i] = pow(x->count_array[i], x->current_exponent);
+    x->weight_array[i] = pow(x->weight_array[i], x->current_exponent);
   }
 }
 
@@ -119,6 +119,10 @@ void statfeed_onbang(t_statfeed * x, t_floatarg f){  // This isn't a bang, it's 
   for (int i=0; i<x->num_elems; i++){
     post("Count %i: %f", i, x->count_array[i]);
   }
+    post("----");
+  for (int i=0; i<x->num_elems; i++){
+    post("Weight %i: %f", i, x->weight_array[i]);
+  }
 }
 
 
@@ -133,7 +137,20 @@ void statfeed_randomize(t_statfeed * x){
   for(int i=0; i<x->num_elems; i++){
     x->count_array[i] = rand() % 10;
   }
+  statfeed_scale(x);
+  statfeed_exponentiate(x);
+  statfeed_sum(x);
 }
+
+void statfeed_sequence(t_statfeed * x){
+  for(int i=0; i<x->num_elems; i++){
+    x->count_array[i] = x->num_elems-1-i;
+  }
+  statfeed_scale(x);
+  statfeed_exponentiate(x);
+  statfeed_sum(x);
+}
+
 
 void statfeed_counts_out(t_statfeed * x){
   //same as on_bang
@@ -197,6 +214,11 @@ void statfeed_setup(void){
   class_addmethod(statfeed_class,
                   (t_method) statfeed_randomize,
                   gensym("randomize"),
+                  0);
+
+  class_addmethod(statfeed_class,
+                  (t_method) statfeed_sequence,
+                  gensym("sequence"),
                   0);
 
   class_addmethod(statfeed_class,

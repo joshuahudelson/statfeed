@@ -186,7 +186,7 @@ if (x->numbinsinuse > 5){
 		for(i=1;i<x->numbinsinuse;i++){
 	     		if ((x->cumuexponbins[i] >= x->choice) && (x->cumuexponbins[i-1] < x->choice)) {
 				x->choiceindex = i;
-				break;	
+				break;
 			}
 		}
 	}
@@ -257,7 +257,7 @@ void statfeed_tilde_bang(t_statfeed_tilde *x)
 //-------------------------------------------------------DSP FUNCTION
 void statfeed_tilde_dsp(t_statfeed_tilde *x, t_signal **sp)
 {
-  dsp_add(statfeed_tilde_perform, 4, x,
+  dsp_add(statfeed_tilde_perform, 5, x,
           sp[0]->s_vec, sp[1]->s_vec, sp[0]->s_n);
 }
 
