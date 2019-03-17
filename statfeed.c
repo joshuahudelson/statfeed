@@ -8,6 +8,7 @@ static t_class * statfeed_class;
 
 typedef struct statfeed{
   t_object    x_obj;
+  t_int       max_num_elems;
   t_int       num_elems;
   t_float     current_exponent;
   t_int       most_recent_output;
@@ -61,7 +62,7 @@ void statfeed_zero(t_statfeed * x){
 
 
 void statfeed_scale(t_statfeed * x){
-  int largest = 0;
+  largest = 0;
   for (int i=0; i<x->num_elems;i++){
     if (x->count_array[i] > largest){
       largest = x->count_array[i];
