@@ -60,12 +60,12 @@ typedef struct _statfeed_tilde {
 } t_statfeed_tilde;
 
 
-float lin_interp(float val1, float val2, float exponent){
-	int temp1 = (int) exponent;
-	float mult1 = exponent - temp1;
- 	float mult2 = 1.0 - mult1;
+t_float lin_interp(float val1, float val2, float exponent){
+	t_int temp1 = (t_int) exponent;
+	t_float mult1 = exponent - temp1;
+ 	t_float mult2 = 1.0 - mult1;
 
-	float result = (val1*mult2) + (val2*mult1);
+	t_float result = (val1 * mult2) + (val2 * mult1);
 
 	return result;
 }
@@ -79,6 +79,8 @@ t_int *statfeed_tilde_perform(t_int *w)
   int          n =           (int)(w[4]);
 
 int i;
+
+
 
 //  Make sure that Inlet 1 (not the signal inlet) is within range.  Then give the value to numbinsinuse.
     if (x->inlet1 < 2){
@@ -106,6 +108,8 @@ int i;
 for(i=x->numbinsinuse;i<x->maxnumbins;i++){
     x->bins[i] = 0;
 }
+
+
 
 //  The DSP part.
 while (n--){
@@ -156,6 +160,8 @@ for(i=1;i<x->numbinsinuse;i++){
 		x->cumuexponbins[i] = x->cumuexponbins[i-1] + x->exponbins[i];
 	}
 }
+
+
 
 //  Give incoming random number to choice, then make sure the number is within range.
 x->choice = *in1++;
@@ -283,6 +289,8 @@ switch(argc){
   default:
   case 2:
     x->maxexpon = (int) atom_getfloat(argv+1);
+    x->maxnumbins = (int) atom_getfloat(argv);
+    break;
   case 1:
     x->maxnumbins = (int) atom_getfloat(argv);
     break;
@@ -340,11 +348,13 @@ void statfeed_tilde_setup(void) {
         A_GIMME, 0);
 
 //  Respond to the "dsp" message from PD.
-    class_addmethod(statfeed_tilde_class,
-        (t_method)statfeed_tilde_dsp, gensym("dsp"), 0);
+  class_addmethod(statfeed_tilde_class,
+      (t_method)statfeed_tilde_dsp, gensym("dsp"), 0);
 
 //  Additional Methods (for first inlet).
   class_addbang(statfeed_tilde_class, statfeed_tilde_bang);
+
+  //class_sethelpsymbol(statfeed_tilde_class, gensym("statfeed~"));
 
   CLASS_MAINSIGNALIN(statfeed_tilde_class, t_statfeed_tilde, signal1);
 
