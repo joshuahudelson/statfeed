@@ -12,9 +12,9 @@ typedef struct statfeed{
   t_int       num_elems;
   t_float     current_exponent;
   t_int       most_recent_output;
-  t_float     count_array[100];
-  t_float     weight_array[100];
-  t_float     cumulative_array[100];
+  t_float     count_array[1000];
+  t_float     weight_array[1000];
+  t_float     cumulative_array[1000];
   t_inlet     * in_elems, * in_exp;
   t_outlet    * out, * outlist;
 
@@ -174,7 +174,7 @@ void * statfeed_new(t_floatarg f1, t_floatarg f2){
   x->out      = outlet_new(&x->x_obj, &s_float);
   x->outlist  = outlet_new(&x->x_obj, &s_list);
 
-  for (int i=0; i<100; i++){
+  for (int i=0; i<1000; i++){
     x->count_array[i] = 1;
   }
 
