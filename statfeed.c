@@ -61,7 +61,7 @@ void statfeed_zero(t_statfeed * x){
 
 
 void statfeed_scale(t_statfeed * x){
-  largest = 0;
+  int largest = 0;
   for (int i=0; i<x->num_elems;i++){
     if (x->count_array[i] > largest){
       largest = x->count_array[i];
