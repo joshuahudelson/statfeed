@@ -8,7 +8,6 @@ static t_class * statfeed_class;
 
 typedef struct statfeed{
   t_object    x_obj;
-  t_int       max_num_elems;
   t_int       num_elems;
   t_float     current_exponent;
   t_int       most_recent_output;
