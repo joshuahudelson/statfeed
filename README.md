@@ -6,7 +6,7 @@ The first inlet receives an audio signal.  To run the
 external in its standard, probabilistic mode, connect
 it to the output of a noise~ object.
 
-The second inlet receies a float that determines
+The second inlet receives a float that determines
 the number of elements (which directly corresponds 
 to the periodicity of the output signal).  Minimum 
 is 2; maximum is 1000.
