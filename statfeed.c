@@ -125,11 +125,20 @@ void statfeed_onbang(t_statfeed * x, t_floatarg f){  // This isn't a bang, it's 
   }
 }
 
+void statfeed_counts_out(t_statfeed * x){
+  //same as on_bang
+  t_atom at[x->num_elems];
+  for (int i=0; i<x->num_elems; i++){
+    SETFLOAT(at+i, x->count_array[i]);
+  }
+  outlet_list(x->outlist, &s_list, x->num_elems, at);
+}
 
 void statfeed_onfloat(t_statfeed * x, t_floatarg f){
   statfeed_getIndex(x, f);
   statfeed_update(x, f);
   outlet_float(x->out, x->most_recent_output);
+  statfeed_counts_out(x);
 }
 
 void statfeed_randomize(t_statfeed * x){
@@ -151,15 +160,6 @@ void statfeed_sequence(t_statfeed * x){
   statfeed_sum(x);
 }
 
-
-void statfeed_counts_out(t_statfeed * x){
-  //same as on_bang
-  t_atom at[x->num_elems];
-  for (int i=0; i<x->num_elems; i++){
-    SETFLOAT(at+i, x->count_array[i]);
-  }
-  outlet_list(x->outlist, &s_list, x->num_elems, at);
-}
 
 
 void * statfeed_new(t_floatarg f1, t_floatarg f2){
